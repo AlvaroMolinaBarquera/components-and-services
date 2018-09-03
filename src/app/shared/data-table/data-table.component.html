@@ -1,0 +1,54 @@
+<table class="table table-stripped">
+  <thead>
+    <tr>
+      <th *ngFor="let column of columnsSource"> {{column.text}} </th>
+      <th *ngIf="hasActions">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <ng-container *ngFor="let row of dataSource"> 
+      <tr>
+          <td *ngFor="let column of columnsSource">
+             <span>{{row[column.key]}}</span>
+          </td>
+          <!-- Acciones -->
+          <td *ngIf="hasActions">
+              <ng-container *ngFor="let action of row.actions">
+                <!-- Opción 1 Texto -->
+                <span 
+                  *ngIf="action.text" 
+                  class="action action-text action-clickeable" 
+                  (click)="action.action(row)">
+                  {{action.text}}
+                </span>
+                <!-- Opción 2 Icono con acción -->
+                <!-- Poner aqui los estilos adecuados -->
+                <span 
+                  *ngIf="action.icon" 
+                  class="icon icon-clickable" 
+                  [ngClass]="['icon-' + action.icon]" 
+                  (click)="action.action(row)">
+                </span>
+                <!-- Opción 3 Columna Detalle -->
+                <span 
+                  *ngIf="action.component" 
+                  (click)="openDetail(row, action)" 
+                  class="icon icon-clickable"
+                  [class.icon-arrow-circle-down]="!row.detailExpanded"
+                  [class.icon-arrow-circle-up]="row.detailExpanded"
+                >Icono Detalle</span>  
+              </ng-container>
+    
+            </td>
+      </tr>
+      <!-- Columna expandida -->
+      <tr *ngIf="row.detailExpanded">
+          <!-- Columnas es igual a la longitud de las columnas mas una de la de acciones -->
+          <td [attr.colspan]="columnsSource.length + 1">
+              <ng-container table-detail></ng-container>
+          </td>
+      </tr>
+    </ng-container>   
+  </tbody>
+</table>
+ 
