@@ -3,8 +3,7 @@ import { Http } from '@angular/http';
 import { EntryComponent } from './shared/entry/entry.component';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { TableDetailService } from './shared/data-table/table-detail/table-detail.service';
-
+import { FormBuilder, FormGroup } from '@angular/forms';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -13,10 +12,19 @@ import { TableDetailService } from './shared/data-table/table-detail/table-detai
 export class AppComponent {
   source;
   columns;
-
+  form: FormGroup;
   constructor(
     private http: Http,
+    private formBuilder: FormBuilder
   ) {
+    this.form = this.formBuilder.group({
+      attachments: [],
+    });
+
+    this.form.valueChanges.subscribe((data) => {
+      console.log('El formulario ha cambiado =>', data);
+    });
+
     const actions = [
       {
         text: 'Prueba', action: this.normalAction

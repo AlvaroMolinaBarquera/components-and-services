@@ -1,6 +1,6 @@
 import { NgModule, } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DataTableComponent } from './data-table.component'
+import { DataTableComponent } from './data-table.component';
 import { TableDetailDirective } from './table-detail/table-detail.directive';
 
 @NgModule({

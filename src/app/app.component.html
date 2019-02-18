@@ -1,4 +1,12 @@
 <div class="card">
+  <form [formGroup]="form">
+      <app-file-input formControlName="attachments">
+          <button class="btn btn-primary" #fileButton>
+            Subir Archivo
+          </button>
+        </app-file-input>
+  </form>
+
   <div class="card-body">
     <!-- <app-filter [menus]="menus"></app-filter> -->
     <data-table [dataSource]="source" [columnsSource]="columns"></data-table>

@@ -3,7 +3,8 @@ import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import 'popper.js';
 import 'jquery';
 import 'bootstrap';
@@ -16,6 +17,7 @@ import 'bootstrap';
     BrowserModule,
     SharedModule,
     HttpModule,
+    ReactiveFormsModule,
     NgbModule.forRoot(),
   ],
   providers: [],
