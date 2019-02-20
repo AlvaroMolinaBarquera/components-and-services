@@ -1,7 +1,7 @@
 import {
   Component, ViewChild,
-  ElementRef, Input, ContentChildren, AfterViewInit, QueryList, forwardRef,
-  OnChanges
+  ElementRef, Input, ContentChild, AfterViewInit, QueryList, forwardRef,
+  OnChanges, Renderer2
 } from '@angular/core';
 import { FileReaderService } from './../file-reader/file-reader.service';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -21,8 +21,7 @@ import { ExpandedFiles } from './../models/expanded-files';
 })
 export class FileInputComponent implements AfterViewInit, ControlValueAccessor, OnChanges {
   @ViewChild('fileSelector') fileSelector: ElementRef;
-  /** @todo Estaria bien poder pasarle un nombre que eligiera la aplicación */
-  @ContentChildren('fileButton') buttonQueryList: QueryList<any>;
+  @ContentChild('fileButton') button: any;
   @Input() multiple: boolean;
   @Input() accept: string;
   @Input() capture: string = null;
@@ -32,17 +31,16 @@ export class FileInputComponent implements AfterViewInit, ControlValueAccessor, 
   propagateChange: any = () => { };
   constructor(
     private fileReaderService: FileReaderService,
+    private renderer2: Renderer2
   ) { }
 
   ngAfterViewInit() {
-    this.buttonQueryList.forEach((f) => {
-      this.buttonNativeElement = f.nativeElement || f._elementRef.nativeElement;
-      try {
-        this.buttonNativeElement.onclick = (e: MouseEvent) => (!this.disabled) ? this.fileSelector.nativeElement.click() : null;
-      } catch (e) {
-        throw new Error('LQP-FILE-INPUT => El elemento no tiene "_elementRef.nativeElement" ni es un "nativeElement"' + e.message);
-      }
-    });
+    this.buttonNativeElement = this.button.nativeElement || this.button._elementRef.nativeElement;
+    try {
+      this.buttonNativeElement.onclick = (e: MouseEvent) => (!this.disabled) ? this.fileSelector.nativeElement.click() : null;
+    } catch (e) {
+      throw new Error('FILE-INPUT => El elemento no tiene "_elementRef.nativeElement" ni es un "nativeElement"' + e.message);
+    }
   }
 
   /** Función que se dispara cuando al pulsar el botón del file-input se añaden archivos */
@@ -57,8 +55,18 @@ export class FileInputComponent implements AfterViewInit, ControlValueAccessor, 
 
   setDisabledState(isDisabled: boolean) {
     this.disabled = isDisabled;
-    /** ¿Aplicamos los estilos deshabilitados al botón? */
-    // En teoria se hace con Render2.addClass and Render2.removeClass
+    // Esto falla, si se llama al is disabled antes de que se cargue el botón.
+    try {
+      // Nombre de la clase que se va a añadir
+      const DISABLED = 'disabled';
+      if (isDisabled) {
+        this.renderer2.setAttribute(this.buttonNativeElement, DISABLED, 'true');
+      } else {
+        this.renderer2.removeAttribute(this.buttonNativeElement, DISABLED);
+      }
+    } catch (e) {
+      console.error(`FILE-INPUT => Se ha tratado de deshabilitar el botón del file selector antes de que se inicialice la vista`);
+    }
   }
 
   ngOnChanges(files) {
