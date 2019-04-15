@@ -19,15 +19,12 @@ export class AppComponent {
   ) {
     this.form = this.formBuilder.group({
       attachments: [],
+      onlyNumbers: [],
+      nullValue: []
     });
     // this.form.get('attachments').disable();
     this.form.valueChanges.subscribe((data) => {
-      this.form.get('attachments').disable({emitEvent: false});
-      setTimeout(() => {
-        console.log('Habilitado')
-        this.form.get('attachments').enable({emitEvent: false});
-      }, 3000);
-      console.log('El formulario ha cambiado =>', data);
+      console.log('El formulario ha cambiado', data);
     });
 
     const actions = [

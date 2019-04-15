@@ -5,6 +5,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { EntryComponent } from './entry/entry.component';
 import { DataTableModule } from './data-table/data-table.module';
 import { FilesModule } from './files/files.module';
+import { OnlyNumbersDirective } from './directives/only-number.diretive';
+import { NullValueDirective } from './directives/null-value.directive';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -12,8 +15,8 @@ import { FilesModule } from './files/files.module';
     DataTableModule,
     FilesModule
   ],
-  declarations: [EntryComponent],
+  declarations: [EntryComponent, OnlyNumbersDirective, NullValueDirective],
   entryComponents: [EntryComponent],
-  exports: [ DataTableModule, FilesModule]
+  exports: [DataTableModule, FilesModule, OnlyNumbersDirective, NullValueDirective]
 })
 export class SharedModule { }
