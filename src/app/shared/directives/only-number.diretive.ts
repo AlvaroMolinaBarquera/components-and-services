@@ -1,8 +1,11 @@
 import { Directive, ElementRef, HostListener, Input, AfterViewInit } from '@angular/core';
+import { NgControl } from '@angular/forms';
+
 const DECIMAL_SEPARATOR = '.';
 const DEFAULT_MAX_DECIMALS = 2;
 const DEFAULT_MAX_INTEGERS = 12;
 const DEFAULT_MAXLENGTH = 15;
+const ALT_GR_KEY = 'AltGraph';
 
 @Directive({
   selector: '[OnlyNumbers]'
@@ -12,7 +15,14 @@ export class OnlyNumbersDirective implements AfterViewInit {
   @Input('MaxDecimals') maxDecimals: number;
   @Input('MaxIntegers') maxIntegers: number;
   private maxlength: number;
-  constructor(private el: ElementRef) { }
+  /** Controla si tiene AltGr pulsado */
+  private altGrIsPressed = false;
+  /**
+   * Expresión regular con todos los caracteres especiales que se pueden crear pulsando AltGr y una serie de botones
+   * @example AltGr + 43 crea #.
+   */
+  private invalidAltGrCharacters = new RegExp('[#~@€~|¬]', 'g');
+  constructor(private el: ElementRef, private control: NgControl) { }
 
   ngAfterViewInit() {
     this.maxDecimals = this.maxDecimals || DEFAULT_MAX_DECIMALS;
@@ -21,8 +31,31 @@ export class OnlyNumbersDirective implements AfterViewInit {
     this.maxlength = (maxlength) ? Number(maxlength) : DEFAULT_MAXLENGTH;
   }
 
+  @HostListener('keyup', ['$event']) onkeyup() {
+    const e = <KeyboardEvent>event;
+    if (e.key === ALT_GR_KEY) {
+      this.altGrIsPressed = false;
+    }
+    // Controlamos, que al producirse un evento de KEYUP.
+    // No se introduzcan los caracteres especiales, indicados en la expresión regular
+    // que NO DISPARAN los eventos de pulsar el teclado. Pero que se pueden poner introduciendo
+    // un patrón de combinación manteniendo AltGr pulsado.
+    if (this.control.control.value) {
+      let value = this.control.control.value;
+      if (this.invalidAltGrCharacters.test(value)) {
+        this.control.control.setValue(value.replace(this.invalidAltGrCharacters, ''));
+        value = this.control.control.value;
+      }
+    }
+
+  }
+
   @HostListener('keydown', ['$event']) onKeyDown(event) {
     const e = <KeyboardEvent>event;
+
+    if (e.key === ALT_GR_KEY) {
+      this.altGrIsPressed = true;
+    }
     const standarAllowed = [
       // DELETE
       46,
@@ -41,8 +74,8 @@ export class OnlyNumbersDirective implements AfterViewInit {
         190);
     }
     // Si hay más de "X decimales" evitamos que escriba más
-    if (this.el.nativeElement.value) {
-      const value = this.el.nativeElement.value;
+    if (this.control.control.value) {
+      const value = this.control.control.value;
       const indexOfDecimal = value.indexOf(DECIMAL_SEPARATOR);
       const cursorPosition = (<HTMLInputElement>this.el.nativeElement).selectionStart;
       // aceptamos solo N enteros y dos decimales pero permitimos el punto del decimal,
@@ -79,7 +112,7 @@ export class OnlyNumbersDirective implements AfterViewInit {
         ) {
           e.preventDefault();
         }
-        // Evita que se pulse el botón de '.' más de una vez 
+        // Evita que se pulse el botón de '.' más de una vez
         if (e.keyCode === 110 || e.keyCode === 190) {
           e.preventDefault();
         }
@@ -101,8 +134,8 @@ export class OnlyNumbersDirective implements AfterViewInit {
     // solo permite numéricos
     if (((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105))
       // para evitar AltGr + Numéricos
-      || (((e.keyCode > 48) && (e.keyCode < 57)) && (e.ctrlKey || e.metaKey || e.altKey))
-      || ((((e.keyCode > 96) && (e.keyCode < 105))) && (e.ctrlKey || e.metaKey || e.altKey))) {
+      || (((e.keyCode > 48) && (e.keyCode < 57)) && (e.ctrlKey || e.metaKey || e.altKey || this.altGrIsPressed))
+      || ((((e.keyCode > 96) && (e.keyCode < 105))) && (e.ctrlKey || e.metaKey || e.altKey || this.altGrIsPressed))) {
       e.preventDefault();
     }
 
