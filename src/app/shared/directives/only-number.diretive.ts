@@ -1,7 +1,9 @@
 import { Directive, ElementRef, HostListener, Input, AfterViewInit } from '@angular/core';
 import { NgControl } from '@angular/forms';
+import { KEY_CODES } from './key-codes.const';
 
 const DECIMAL_SEPARATOR = '.';
+const SUBSTRACT = '-';
 const DEFAULT_MAX_DECIMALS = 2;
 const DEFAULT_MAX_INTEGERS = 12;
 const DEFAULT_MAXLENGTH = 15;
@@ -11,8 +13,13 @@ const ALT_GR_KEY = 'AltGraph';
   selector: '[OnlyNumbers]'
 })
 export class OnlyNumbersDirective implements AfterViewInit {
+  /** Controla que solo permita positivos */
+  @Input('OnlyPositives') onlyPositives: boolean = true;
+  /** Controla que solo permita numeros enteros */
   @Input('OnlyIntegers') onlyIntegers: boolean;
+  /** Maximo de enteros */
   @Input('MaxDecimals') maxDecimals: number;
+  /** Maximo de decimales */
   @Input('MaxIntegers') maxIntegers: number;
   private maxlength: number;
   /** Controla si tiene AltGr pulsado */
@@ -51,93 +58,116 @@ export class OnlyNumbersDirective implements AfterViewInit {
   }
 
   @HostListener('keydown', ['$event']) onKeyDown(event) {
+    const cursorPosition = (<HTMLInputElement>this.el.nativeElement).selectionStart;
     const e = <KeyboardEvent>event;
-
     if (e.key === ALT_GR_KEY) {
       this.altGrIsPressed = true;
     }
     const standarAllowed = [
-      // DELETE
-      46,
-      // Backspace
-      8,
-      // tab
-      9,
-      // Enter
-      13
+      KEY_CODES.DELETE,
+      KEY_CODES.BACKSPACE,
+      KEY_CODES.TAB,
+      KEY_CODES.ENTER,
+      KEY_CODES.LEFT_ARROW,
+      KEY_CODES.RIGTH_ARROW,
+      KEY_CODES.END,
+      KEY_CODES.HOME
     ];
     if (!this.onlyIntegers) {
-      standarAllowed.push(
-        // Decimal Point
-        110,
-        // Dot
-        190);
+      standarAllowed.push(KEY_CODES.DECIMAL_POINT, KEY_CODES.DOT);
+    }
+    if (!this.onlyPositives) {
+      standarAllowed.push(KEY_CODES.NUMPAD_SUBTRAC, KEY_CODES.SLASH);
+    }
+    // Comprueba que no permite escribir puntos al incio
+    if ((e.keyCode === KEY_CODES.DECIMAL_POINT || e.keyCode === KEY_CODES.DOT) && cursorPosition === 0) {
+      e.preventDefault();
     }
     // Si hay más de "X decimales" evitamos que escriba más
     if (this.control.control.value) {
       const value = this.control.control.value;
       const indexOfDecimal = value.indexOf(DECIMAL_SEPARATOR);
-      const cursorPosition = (<HTMLInputElement>this.el.nativeElement).selectionStart;
+      const indexOfSubstract = value.indexOf(SUBSTRACT);
       // aceptamos solo N enteros y dos decimales pero permitimos el punto del decimal,
       // el retroceso, inicio, fin, tabulación, suprimir a partir de la posicion 12
       if (
         (value.length >= this.maxIntegers) &&
         (
-          (e.keyCode !== 190) &&
-          (e.keyCode !== 8) &&
-          (e.keyCode !== 46) &&
-          (e.keyCode !== 9) &&
-          (e.keyCode !== 37) &&
-          (e.keyCode !== 39) &&
-          !((indexOfDecimal > -1))
-          // permite mayúsculas inicio, mayúsculas fin
-          && !((e.keyCode >= 35) && (e.keyCode <= 36))
+          standarAllowed.indexOf(e.keyCode) === -1 &&
+          !(indexOfDecimal > -1)
         )
       ) {
         e.preventDefault();
       }
       // No se permiten más de longitud X
-      if (value.length === this.maxlength && standarAllowed.indexOf(e.keyCode) === -1) {
+      if (value.length >= this.maxlength && standarAllowed.indexOf(e.keyCode) === -1) {
         e.preventDefault();
       }
 
+      // Si pulsa el BORRAR o SUPRIMIR
+      if (e.keyCode === KEY_CODES.BACKSPACE || e.keyCode === KEY_CODES.DELETE) {
+        // Y hay separador decimal
+        if (indexOfDecimal > -1) {
+          // Comprobamos que se intenta borrar el PUNTO
+          if (
+            ((e.keyCode === KEY_CODES.BACKSPACE) && (indexOfDecimal === (cursorPosition - 1))) ||
+            ((e.keyCode === KEY_CODES.DELETE) && (indexOfDecimal === cursorPosition))
+          ) {
+            // Si se intenta borrar el punto comprobamos la longitud de los enteros.
+            const integers = value.substr(0, indexOfDecimal).length;
+            const decimals = value.substring(indexOfDecimal + 1).length;
+            // Sumamos DECIMALES + ENTEROS. Y si supera los enteros. Evitamos el
+            if ((integers + decimals) > this.maxIntegers) {
+              e.preventDefault();
+            }
+          }
+        }
+      }
+
+      // Comprobamos si estamos tratando de añadir un "-" en cualquier otra posición que no sea el principio
+      if ((e.keyCode === KEY_CODES.NUMPAD_SUBTRAC || e.keyCode === KEY_CODES.SLASH) && cursorPosition !== 0) {
+        e.preventDefault();
+      }
       // Logica a aplicar en caso de que vengan decimales
       if (indexOfDecimal > -1) {
         // Evita que se escriban más de X Decimales
         if (
-
           value.substring(indexOfDecimal).length > this.maxDecimals &&
-          ((e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105)) &&
+          this.isNum(e.keyCode) &&
           cursorPosition > indexOfDecimal
         ) {
           e.preventDefault();
         }
         // Evita que se pulse el botón de '.' más de una vez
-        if (e.keyCode === 110 || e.keyCode === 190) {
+        if (e.keyCode === KEY_CODES.DOT || e.keyCode === KEY_CODES.DECIMAL_POINT) {
           e.preventDefault();
         }
       }
     }
     if (standarAllowed.indexOf(e.keyCode) !== -1 ||
       // Permite: Ctrl+A
-      (e.keyCode === 65 && (e.ctrlKey || e.metaKey)) ||
+      (e.keyCode === KEY_CODES.A && (e.ctrlKey || e.metaKey)) ||
       // Permite: Ctrl+C
-      (e.keyCode === 67 && (e.ctrlKey || e.metaKey)) ||
+      (e.keyCode === KEY_CODES.C && (e.ctrlKey || e.metaKey)) ||
       // Permite: Ctrl+V
-      (e.keyCode === 86 && (e.ctrlKey || e.metaKey)) ||
+      (e.keyCode === KEY_CODES.V && (e.ctrlKey || e.metaKey)) ||
       // Permite: Ctrl+X
-      (e.keyCode === 88 && (e.ctrlKey || e.metaKey)) ||
+      (e.keyCode === KEY_CODES.X && (e.ctrlKey || e.metaKey)) ||
       // Permite: home, end, left, right
-      (e.keyCode >= 35 && e.keyCode <= 39)) {
+      (e.keyCode >= KEY_CODES.END && e.keyCode <= KEY_CODES.RIGTH_ARROW)) {
       return;
     }
-    // solo permite numéricos
-    if (((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105))
-      // para evitar AltGr + Numéricos
-      || (((e.keyCode > 48) && (e.keyCode < 57)) && (e.ctrlKey || e.metaKey || e.altKey || this.altGrIsPressed))
-      || ((((e.keyCode > 96) && (e.keyCode < 105))) && (e.ctrlKey || e.metaKey || e.altKey || this.altGrIsPressed))) {
+    // Si no es un numero o es un numero pero se está pulsando alguna tecla especial.
+    // Se previene el evento
+    if (
+      (!this.isNum(e.keyCode) ||
+      (this.isNum(e.keyCode) && (e.ctrlKey || e.metaKey || e.altKey || this.altGrIsPressed)))
+    ) {
       e.preventDefault();
     }
+  }
 
+  private isNum(keyCode: number) {
+    return ((keyCode >= 48 && keyCode <= 57) || (keyCode >= 96 && keyCode <= 105));
   }
 }

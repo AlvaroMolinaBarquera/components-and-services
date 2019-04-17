@@ -1,0 +1,18 @@
+export const KEY_CODES = {
+    SLASH: 189,
+    NUMPAD_SUBTRAC: 109,
+    DECIMAL_POINT: 110,
+    DOT: 190,
+    DELETE: 46,
+    BACKSPACE: 8,
+    TAB: 9,
+    ENTER: 13,
+    RIGTH_ARROW: 39,
+    LEFT_ARROW: 37,
+    HOME: 36,
+    END: 35,
+    A: 65,
+    C: 67,
+    V: 86,
+    X: 88,
+};
