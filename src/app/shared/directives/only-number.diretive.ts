@@ -14,7 +14,7 @@ const ALT_GR_KEY = 'AltGraph';
 })
 export class OnlyNumbersDirective implements AfterViewInit {
   /** Controla que solo permita positivos */
-  @Input('OnlyPositives') onlyPositives: boolean = true;
+  @Input('OnlyPositives') onlyPositives: boolean = false;
   /** Controla que solo permita numeros enteros */
   @Input('OnlyIntegers') onlyIntegers: boolean;
   /** Maximo de enteros */
@@ -88,10 +88,14 @@ export class OnlyNumbersDirective implements AfterViewInit {
       const value = this.control.control.value;
       const indexOfDecimal = value.indexOf(DECIMAL_SEPARATOR);
       const indexOfSubstract = value.indexOf(SUBSTRACT);
+      /** Mximo de enteros, no se cuenta el "-" por lo que si tiene un "-" se suma uno a la longitud total */
+      const maxIntegers = this.maxIntegers + ((indexOfSubstract > -1) ? 1 : 0);
+      /** Maxima longitud, no se cuenta el "-" por lo que si tiene un "-" se suma uno a la longitud total */
+      const maxlength = this.maxlength + ((indexOfSubstract > -1) ? 1 : 0);
       // aceptamos solo N enteros y dos decimales pero permitimos el punto del decimal,
       // el retroceso, inicio, fin, tabulación, suprimir a partir de la posicion 12
       if (
-        (value.length >= this.maxIntegers) &&
+        (value.length >= maxIntegers) &&
         (
           standarAllowed.indexOf(e.keyCode) === -1 &&
           !(indexOfDecimal > -1)
@@ -100,7 +104,7 @@ export class OnlyNumbersDirective implements AfterViewInit {
         e.preventDefault();
       }
       // No se permiten más de longitud X
-      if (value.length >= this.maxlength && standarAllowed.indexOf(e.keyCode) === -1) {
+      if (value.length >= maxlength && standarAllowed.indexOf(e.keyCode) === -1) {
         e.preventDefault();
       }
 
@@ -108,7 +112,7 @@ export class OnlyNumbersDirective implements AfterViewInit {
       if (e.keyCode === KEY_CODES.BACKSPACE || e.keyCode === KEY_CODES.DELETE) {
         // Y hay separador decimal
         if (indexOfDecimal > -1) {
-          // Comprobamos que se intenta borrar el PUNTO
+          // Comprobamos que se intenta borrar el PUNTO,  ya sea pulsando el SUPRIMIR o el DELETE
           if (
             ((e.keyCode === KEY_CODES.BACKSPACE) && (indexOfDecimal === (cursorPosition - 1))) ||
             ((e.keyCode === KEY_CODES.DELETE) && (indexOfDecimal === cursorPosition))
@@ -117,7 +121,7 @@ export class OnlyNumbersDirective implements AfterViewInit {
             const integers = value.substr(0, indexOfDecimal).length;
             const decimals = value.substring(indexOfDecimal + 1).length;
             // Sumamos DECIMALES + ENTEROS. Y si supera los enteros. Evitamos el
-            if ((integers + decimals) > this.maxIntegers) {
+            if ((integers + decimals) > maxIntegers) {
               e.preventDefault();
             }
           }
