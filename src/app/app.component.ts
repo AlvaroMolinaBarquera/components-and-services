@@ -4,6 +4,8 @@ import { EntryComponent } from './shared/entry/entry.component';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { LoggerService } from './shared/logger/shared/logger.service'
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -15,8 +17,16 @@ export class AppComponent {
   form: FormGroup;
   constructor(
     private http: Http,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private logger: LoggerService,
   ) {
+    this.logger.debug('Soy una traza de debug', 'Holaaa')
+    this.logger.silly('Soy una traza de silly', 'Holaaa')
+    this.logger.info('Soy una traza de info', 'Holaaa')
+    this.logger.warn('Soy una traza de warn', 'Holaaa')
+    this.logger.error('Soy una traza de error', 'Holaaa')
+    this.logger.fatal('Soy una traza de fatal', 'Holaaa')
+
     this.form = this.formBuilder.group({
       attachments: [],
       onlyNumbers: [],
