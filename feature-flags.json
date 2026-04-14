@@ -1,0 +1,32 @@
+[
+  {
+    "enabled": true,
+    "name": "firstFeature",
+    "team": "teamA",
+    "description": "First Feature for Team A"
+  },
+  {
+    "enabled": true,
+    "name": "stringFeatureFlag",
+    "value": "FEATURE_FLAG_IN_STRING_FORMAT",
+    "team": "teamA",
+    "description": "Feature Flag whose value is an string"
+  },
+  {
+    "enabled": false,
+    "name": "stringFeatureFlagDisabled",
+    "value": "FEATURE_FLAG_STRING_DISABLED",
+    "team": "teamA",
+    "description": "Feature Flag disabled"
+  },
+  {
+    "enabled": false,
+    "name": "secondFeature",
+    "team": "teamB",
+    "description": "Second Feature for Team B",
+    "tenants": [
+      "DE",
+      "NL"
+    ]
+  }
+]
