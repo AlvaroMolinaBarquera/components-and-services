@@ -13,7 +13,7 @@
     "description": "Feature Flag whose value is an string"
   },
   {
-    "enabled": false,
+    "enabled": true,
     "name": "stringFeatureFlagDisabled",
     "value": "FEATURE_FLAG_STRING_DISABLED",
     "team": "teamA",
