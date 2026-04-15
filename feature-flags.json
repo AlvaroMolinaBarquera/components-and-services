@@ -38,5 +38,15 @@
     "tenants": [
       "DE"
     ]
+  },
+  {
+    "name": "anotherAlvaroFromAPI",
+    "team": "alvaro",
+    "description": "Another Test from Alvaro",
+    "value": null,
+    "enabled": true,
+    "tenants": [
+      "DE"
+    ]
   }
 ]
