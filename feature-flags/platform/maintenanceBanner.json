@@ -1,0 +1,8 @@
+{
+  "name": "maintenanceBanner",
+  "team": "platform",
+  "enabled": true,
+  "value": "Scheduled maintenance on Sunday 20:00–22:00 CET",
+  "tenants": ["de", "at", "ch"],
+  "description": "Global maintenance warning banner shown in the top navigation"
+}

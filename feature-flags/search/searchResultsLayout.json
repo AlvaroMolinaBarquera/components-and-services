@@ -1,0 +1,8 @@
+{
+  "name": "searchResultsLayout",
+  "team": "search",
+  "enabled": true,
+  "value": "grid",
+  "tenants": [],
+  "description": "Controls the layout of search results. Possible values: 'grid' | 'list'"
+}

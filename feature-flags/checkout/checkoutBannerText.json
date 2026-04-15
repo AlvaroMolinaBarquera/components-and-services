@@ -1,0 +1,8 @@
+{
+  "name": "checkoutBannerText",
+  "team": "checkout",
+  "enabled": true,
+  "value": "Free shipping on orders over €50!",
+  "tenants": ["de", "at"],
+  "description": "Promotional banner text shown at the top of the checkout page"
+}

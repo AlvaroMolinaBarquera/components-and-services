@@ -1,0 +1,7 @@
+{
+  "name": "aiSearchSuggestions",
+  "team": "search",
+  "enabled": true,
+  "tenants": ["de", "at", "ch", "es", "it"],
+  "description": "AI-powered autocomplete suggestions in the search bar"
+}

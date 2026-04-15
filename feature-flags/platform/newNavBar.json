@@ -1,0 +1,7 @@
+{
+  "name": "newNavBar",
+  "team": "platform",
+  "enabled": false,
+  "tenants": ["de"],
+  "description": "Redesigned top navigation bar, currently in A/B test for German tenants"
+}

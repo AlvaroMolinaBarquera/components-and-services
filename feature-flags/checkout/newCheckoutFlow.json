@@ -1,0 +1,7 @@
+{
+  "name": "newCheckoutFlow",
+  "team": "checkout",
+  "enabled": true,
+  "tenants": [],
+  "description": "Enables the redesigned checkout flow for all users"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "expressPayment",
+  "team": "checkout",
+  "enabled": false,
+  "tenants": [],
+  "description": "One-click express payment button on the cart page"
+}
