@@ -1,7 +1,7 @@
 {
   "name": "darkMode",
   "team": "platform",
-  "enabled": true,
+  "enabled": false,
   "tenants": [],
   "description": "Dark mode toggle available in user preferences"
 }
