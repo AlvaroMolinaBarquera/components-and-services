@@ -1,0 +1,10 @@
+{
+  "name": "techDayDemo",
+  "team": "allianzDirect",
+  "description": "Demo for Tech Day",
+  "value": null,
+  "enabled": false,
+  "tenants": [
+    "DE"
+  ]
+}
