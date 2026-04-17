@@ -3,7 +3,7 @@
   "team": "allianzDirect",
   "description": "Demo for Tech Day",
   "value": null,
-  "enabled": false,
+  "enabled": true,
   "tenants": [
     "DE"
   ]
